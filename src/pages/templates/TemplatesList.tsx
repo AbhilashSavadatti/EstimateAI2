@@ -54,7 +54,7 @@ import {
   UtensilsIcon, 
   SofaIcon,
   TreePineIcon,
-  GarageIcon,
+  GaugeIcon,
   PaintbrushIcon
 } from 'lucide-react';
 
@@ -65,7 +65,7 @@ const TEMPLATE_CATEGORIES = [
   { id: 'living_room', name: 'Living Room', icon: <SofaIcon className="h-5 w-5" /> },
   { id: 'exterior', name: 'Exterior', icon: <HomeIcon className="h-5 w-5" /> },
   { id: 'landscaping', name: 'Landscaping', icon: <TreePineIcon className="h-5 w-5" /> },
-  { id: 'garage', name: 'Garage', icon: <GarageIcon className="h-5 w-5" /> },
+  { id: 'garage', name: 'Garage', icon: <GaugeIcon className="h-5 w-5" /> },
   { id: 'painting', name: 'Painting', icon: <PaintbrushIcon className="h-5 w-5" /> },
 ];
 

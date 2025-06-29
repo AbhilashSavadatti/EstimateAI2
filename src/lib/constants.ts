@@ -94,4 +94,4 @@ export const SUGGESTED_PROFIT_MARGINS = [15, 20, 25, 30, 35];
 
 // Voice recognition constants
 export const VOICE_CONFIDENCE_THRESHOLD = 0.7;
-export const MAX_RECORDING_TIME_MS = 60000; // 60 seconds
+export const MAX_RECORDING_TIME_MS = 5000; // 60 seconds

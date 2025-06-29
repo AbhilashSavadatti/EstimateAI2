@@ -261,9 +261,11 @@ const EstimateForm: React.FC<EstimateFormProps> = ({
                         <FormLabel>Client</FormLabel>
                         <Select 
                           onValueChange={(value) => {
-                            field.onChange(value);
-                            handleFieldChange('client_id', value);
-                          }}
+  const normalizedValue = value === 'no-client' ? '' : value;
+  field.onChange(normalizedValue);
+  handleFieldChange('client_id', normalizedValue);
+}}
+
                           value={field.value}
                         >
                           <FormControl>
@@ -272,7 +274,7 @@ const EstimateForm: React.FC<EstimateFormProps> = ({
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            <SelectItem value="">No client</SelectItem>
+                            <SelectItem value="no-client">No client</SelectItem>
                             {clients.map((client) => (
                               <SelectItem key={client.id} value={client.id}>
                                 {client.name}
