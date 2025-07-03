@@ -1,7 +1,7 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { api } from '@/lib/api';
 
-// Types
+
 export interface User {
   id: string;
   name: string;
@@ -29,10 +29,10 @@ interface RegisterData {
   password: string;
 }
 
-// Context
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider Component
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -128,7 +128,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   );
 };
 
-// Hook
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   

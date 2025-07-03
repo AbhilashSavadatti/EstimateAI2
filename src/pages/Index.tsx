@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import MainLayout from '@/layouts/MainLayout';
 import { CheckIcon, MicIcon, ArrowRightIcon, BarChart3Icon, PieChartIcon, SparklesIcon, ClipboardListIcon, UsersIcon, MessageSquareTextIcon, FileTextIcon } from 'lucide-react';
-
+import img1 from '@/assets/dashboard-preview.jpg'; // Adjust the import path as necessary
 const Index = () => {
   return (
     <MainLayout>
@@ -39,7 +39,7 @@ const Index = () => {
             <div className="col-span-1 lg:col-span-2 relative">
               <div className="relative rounded-lg overflow-hidden shadow-2xl">
                 <img 
-                  src="/public/assets/dashboard-preview.jpg" 
+                  src="https://images.pexels.com/photos/271667/pexels-photo-271667.jpeg" 
                   alt="EstimateAI Dashboard" 
                   className="w-full h-auto rounded-lg"
                 />

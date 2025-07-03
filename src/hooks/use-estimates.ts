@@ -129,7 +129,7 @@ export const useEstimates = () => {
   const exportPdfMutation = useMutation({
     mutationFn: (estimateId: string) => api.estimates.exportPdf(estimateId),
     onSuccess: (result) => {
-      // Open PDF in new tab or trigger download
+    
       window.open(result.url, '_blank');
       toast({
         title: 'PDF exported',
@@ -145,7 +145,7 @@ export const useEstimates = () => {
     },
   });
 
-  // Send estimate via email
+  
   const sendEmailMutation = useMutation({
     mutationFn: ({ estimateId, email }: { estimateId: string; email: string }) => 
       api.estimates.sendEmail(estimateId, email),
@@ -181,7 +181,7 @@ export const useEstimates = () => {
     };
   };
 
-  // Store estimate in progress for multistep form
+ 
   const storeEstimateInProgress = (data: Partial<Estimate>) => {
     setEstimateInProgress(prev => ({ ...prev, ...data }));
     return { ...estimateInProgress, ...data };

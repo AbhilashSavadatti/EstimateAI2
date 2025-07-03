@@ -1,11 +1,10 @@
-// API mode configuration
-export const MOCK_MODE = true; // Set to false when backend is ready
 
-// App information
+export const MOCK_MODE = true; 
+
+
 export const APP_NAME = 'EstimateAI';
 export const APP_COMPANY = 'Trikon Brickloop';
 
-// Subscription tiers
 export const SUBSCRIPTION_TIERS = {
   FREE: 'free',
   BASIC: 'basic',
@@ -13,7 +12,7 @@ export const SUBSCRIPTION_TIERS = {
   ENTERPRISE: 'enterprise',
 };
 
-// Estimate statuses
+
 export const ESTIMATE_STATUS = {
   DRAFT: 'draft',
   PENDING: 'pending',
@@ -22,7 +21,6 @@ export const ESTIMATE_STATUS = {
   ARCHIVED: 'archived',
 };
 
-// Common units for materials
 export const MATERIAL_UNITS = [
   { value: 'sq_ft', label: 'Square Feet' },
   { value: 'sq_yd', label: 'Square Yards' },
@@ -42,7 +40,6 @@ export const MATERIAL_UNITS = [
   { value: 'pallet', label: 'Pallet' },
 ];
 
-// Material categories
 export const MATERIAL_CATEGORIES = [
   { value: 'flooring', label: 'Flooring' },
   { value: 'drywall', label: 'Drywall & Wall Finishes' },
@@ -64,7 +61,7 @@ export const MATERIAL_CATEGORIES = [
   { value: 'other', label: 'Other' },
 ];
 
-// Labor categories
+
 export const LABOR_CATEGORIES = [
   { value: 'general', label: 'General Labor' },
   { value: 'carpentry', label: 'Carpentry' },
@@ -85,13 +82,13 @@ export const LABOR_CATEGORIES = [
   { value: 'other', label: 'Other' },
 ];
 
-// Profit margin ranges
+
 export const DEFAULT_PROFIT_MARGIN = 20;
 export const MIN_PROFIT_MARGIN = 0;
 export const MAX_PROFIT_MARGIN = 100;
 export const PROFIT_MARGIN_STEP = 5;
 export const SUGGESTED_PROFIT_MARGINS = [15, 20, 25, 30, 35];
 
-// Voice recognition constants
+
 export const VOICE_CONFIDENCE_THRESHOLD = 0.7;
-export const MAX_RECORDING_TIME_MS = 5000; // 60 seconds
+export const MAX_RECORDING_TIME_MS = 5000; 

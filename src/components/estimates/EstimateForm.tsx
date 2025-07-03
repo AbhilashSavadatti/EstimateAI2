@@ -181,9 +181,7 @@ const EstimateForm: React.FC<EstimateFormProps> = ({
         estimateId = newEstimate.id;
       }
       
-      // In a real implementation, we would save materials and labor items here
-      // using the estimateId
-      
+   
       toast({
         title: initialData ? 'Estimate updated' : 'Estimate created',
         description: `Your estimate has been ${initialData ? 'updated' : 'created'} successfully.`,
@@ -379,7 +377,7 @@ const EstimateForm: React.FC<EstimateFormProps> = ({
                 type="button" 
                 variant="outline" 
                 onClick={() => {
-                  // Preview functionality would go here
+                  
                   toast({
                     title: 'Preview',
                     description: 'Preview functionality not implemented yet',

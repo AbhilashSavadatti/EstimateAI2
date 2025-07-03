@@ -1,6 +1,7 @@
 import { MOCK_MODE } from './constants';
+const BASE_API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-// Types
+
 export interface Estimate {
   id: string;
   title: string;
@@ -55,7 +56,31 @@ export interface Template {
   is_public: boolean;
 }
 
-// Helper functions
+export interface GeminiAIResponse {
+  materials: Array<{
+    name: string;
+    quantity: number;
+    unit: string;
+    unit_cost: number;
+    total_cost: number;
+    category: string;
+    description?: string;
+  }>;
+  labor: Array<{
+    name: string;
+    hours: number;
+    rate_per_hour: number;
+    total_cost: number;
+    category: string;
+    description?: string;
+  }>;
+  estimated_total: number;
+  estimated_duration_days: number;
+  confidence_score: number;
+  analysis?: string;
+}
+
+
 const getAuthHeader = () => {
   const token = localStorage.getItem('estimateai-token');
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -69,7 +94,11 @@ const handleApiResponse = async (response: Response) => {
   return response.json();
 };
 
-// Mock data and implementations for development
+
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+
+
 const mockAuthData = {
   user: {
     id: '1',
@@ -92,7 +121,7 @@ const mockEstimates: Estimate[] = [
     profit_margin: 15,
     location_zipcode: '90210',
     client_id: '1',
-    client_name: 'John Smith',
+    client_name: 'Priya Mehta',
     created_at: '2023-06-15T00:00:00Z',
     updated_at: '2023-06-16T00:00:00Z',
   },
@@ -105,7 +134,7 @@ const mockEstimates: Estimate[] = [
     profit_margin: 18,
     location_zipcode: '90211',
     client_id: '2',
-    client_name: 'Sarah Johnson',
+    client_name: 'Rahul Sharma',
     created_at: '2023-06-18T00:00:00Z',
     updated_at: '2023-06-18T00:00:00Z',
   },
@@ -118,80 +147,251 @@ const mockEstimates: Estimate[] = [
     profit_margin: 20,
     location_zipcode: '90212',
     client_id: '3',
-    client_name: 'Michael Brown',
+    client_name: 'Arjun Verma',
     created_at: '2023-06-20T00:00:00Z',
     updated_at: '2023-06-21T00:00:00Z',
   },
 ];
 
 const mockClients: Client[] = [
-  { id: '1', name: 'John Smith', email: 'john@example.com', phone: '(555) 123-4567' },
-  { id: '2', name: 'Sarah Johnson', email: 'sarah@example.com', phone: '(555) 234-5678' },
-  { id: '3', name: 'Michael Brown', email: 'michael@example.com', phone: '(555) 345-6789' },
+  { id: '1', name: 'Rahul Sharma', email: 'rahul.sharma@example.in', phone: '+91 98765 43210' },
+  { id: '2', name: 'Priya Mehta', email: 'priya.mehta@example.in', phone: '+91 91234 56789' },
+  { id: '3', name: 'Arjun Verma', email: 'arjun.verma@example.in', phone: '+91 99887 76655' },
 ];
 
-// Gemini AI integration
-const processWithGeminiAI = async (text: string) => {
-  // In a real implementation, this would call the Gemini AI API
-  // For now, we return a mock response
-  console.log(`Processing with Gemini AI: ${text}`);
+
+
+const processWithGeminiAI = async (text: string, location?: string): Promise<GeminiAIResponse> => {
+  if (!GEMINI_API_KEY) {
+    throw new Error('Gemini API key is not configured. Please set REACT_APP_GEMINI_API_KEY or GEMINI_API_KEY environment variable.');
+  }
+
+  const locationContext = location ? `Location: ${location}. ` : '';
   
-  // Simulate AI processing delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  // Mock response based on input text
-  const mockResponse = {
-    materials: [
-      { 
-        name: 'Drywall', 
-        quantity: 12, 
-        unit: 'sheets', 
-        unit_cost: 15.75,
-        total_cost: 189.00,
-        category: 'Building Materials'
+  const prompt = `${locationContext}You are an expert construction estimator. Analyze the following project description and provide a detailed cost estimate. Return your response as a valid JSON object with the following structure:
+
+{
+  "materials": [
+    {
+      "name": "Material name",
+      "quantity": number,
+      "unit": "unit of measurement",
+      "unit_cost": number,
+      "total_cost": number,
+      "category": "category name",
+      "description": "optional description"
+    }
+  ],
+  "labor": [
+    {
+      "name": "Labor task name",
+      "hours": number,
+      "rate_per_hour": number,
+      "total_cost": number,
+      "category": "Labor",
+      "description": "optional description"
+    }
+  ],
+  "estimated_total": number,
+  "estimated_duration_days": number,
+  "confidence_score": number (0-1),
+  "analysis": "Brief analysis of the project"
+}
+
+Use realistic market prices and consider:
+- Material costs and waste factors
+- Labor complexity and skill requirements
+- Regional price variations if location provided
+- Standard industry markup
+- Typical project timeline
+
+Project description: ${text}
+
+Respond only with the JSON object, no additional text.`;
+
+  try {
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      { 
-        name: 'Paint', 
-        quantity: 3, 
-        unit: 'gallons', 
-        unit_cost: 35.50,
-        total_cost: 106.50,
-        category: 'Finishes'
-      },
-      { 
-        name: 'Lumber (2x4)', 
-        quantity: 24, 
-        unit: 'pieces', 
-        unit_cost: 4.25,
-        total_cost: 102.00,
-        category: 'Building Materials'
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.3,
+          topK: 32,
+          topP: 1,
+          maxOutputTokens: 2048,
+        },
+        safetySettings: [
+          {
+            category: "HARM_CATEGORY_HARASSMENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_HATE_SPEECH",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          },
+          {
+            category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+            threshold: "BLOCK_MEDIUM_AND_ABOVE"
+          }
+        ]
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
+    }
+
+    const data = await response.json();
+    
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error('No response from Gemini AI');
+    }
+
+    const generatedText = data.candidates[0].content.parts[0].text;
+    
+    // Clean up the response text (remove markdown code blocks if present)
+    const cleanedText = generatedText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+    
+    try {
+      const parsedResponse = JSON.parse(cleanedText);
+      
+      // Validate the response structure
+      if (!parsedResponse.materials || !parsedResponse.labor) {
+        throw new Error('Invalid response structure from Gemini AI');
       }
-    ],
-    labor: [
-      {
-        name: 'Drywall Installation', 
-        hours: 16, 
-        rate_per_hour: 35.00,
-        total_cost: 560.00,
-        category: 'Labor'
-      },
-      {
-        name: 'Painting', 
-        hours: 12, 
-        rate_per_hour: 45.00,
-        total_cost: 540.00,
-        category: 'Labor'
-      }
-    ],
-    estimated_total: 1497.50,
-    estimated_duration_days: 5,
-    confidence_score: 0.85
-  };
-  
-  return mockResponse;
+      
+      return parsedResponse as GeminiAIResponse;
+    } catch (parseError) {
+      console.error('Failed to parse Gemini AI response:', cleanedText);
+      throw new Error('Failed to parse Gemini AI response. The AI may have returned invalid JSON.');
+    }
+  } catch (error) {
+    console.error('Gemini AI processing error:', error);
+    
+    
+    console.warn('Falling back to mock data due to Gemini AI error');
+    return {
+      materials: [
+        { 
+          name: 'Drywall', 
+          quantity: 12, 
+          unit: 'sheets', 
+          unit_cost: 15.75,
+          total_cost: 189.00,
+          category: 'Building Materials'
+        },
+        { 
+          name: 'Paint', 
+          quantity: 3, 
+          unit: 'gallons', 
+          unit_cost: 35.50,
+          total_cost: 106.50,
+          category: 'Finishes'
+        },
+        { 
+          name: 'Lumber (2x4)', 
+          quantity: 24, 
+          unit: 'pieces', 
+          unit_cost: 4.25,
+          total_cost: 102.00,
+          category: 'Building Materials'
+        }
+      ],
+      labor: [
+        {
+          name: 'Drywall Installation', 
+          hours: 16, 
+          rate_per_hour: 35.00,
+          total_cost: 560.00,
+          category: 'Labor'
+        },
+        {
+          name: 'Painting', 
+          hours: 12, 
+          rate_per_hour: 45.00,
+          total_cost: 540.00,
+          category: 'Labor'
+        }
+      ],
+      estimated_total: 1497.50,
+      estimated_duration_days: 5,
+      confidence_score: 0.75,
+      analysis: 'Estimate generated using fallback data due to API unavailability.'
+    };
+  }
 };
 
-// API Implementation
+// Voice transcription with Gemini AI
+const transcribeAudioWithGemini = async (audioData: Blob): Promise<{ text: string; confidence: number }> => {
+  if (!GEMINI_API_KEY) {
+    throw new Error('Gemini API key is not configured');
+  }
+
+  try {
+    // Convert audio blob to base64
+    const arrayBuffer = await audioData.arrayBuffer();
+    const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+    
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            {
+              text: "Transcribe this audio and extract any construction project details. Return a JSON object with 'text' (the transcription) and 'confidence' (0-1 score)."
+            },
+            {
+              inline_data: {
+                mime_type: audioData.type || 'audio/wav',
+                data: base64Audio
+              }
+            }
+          ]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 1024,
+        }
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    const result = JSON.parse(data.candidates[0].content.parts[0].text);
+    
+    return {
+      text: result.text || "Unable to transcribe audio",
+      confidence: result.confidence || 0.5
+    };
+  } catch (error) {
+    console.error('Audio transcription error:', error);
+    // Fallback for audio processing
+    return {
+      text: "Kitchen remodel with new cabinets, quartz countertops, and stainless steel appliances. Approximately 200 square feet.",
+      confidence: 0.6
+    };
+  }
+};
+
+// API Implementation for bakced
 export const api = {
   auth: {
     login: async (email: string, password: string) => {
@@ -200,7 +400,7 @@ export const api = {
         return mockAuthData;
       }
       
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(`${BASE_API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -215,7 +415,7 @@ export const api = {
         return { ...mockAuthData, user: { ...mockAuthData.user, ...data } };
       }
       
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
@@ -230,7 +430,7 @@ export const api = {
         return mockAuthData.user;
       }
       
-      const response = await fetch('/api/users/profile', {
+      const response = await fetch('http://localhost:5000/api/users/profile', {
         headers: getAuthHeader(),
       });
       
@@ -243,7 +443,7 @@ export const api = {
         return { ...mockAuthData.user, ...data };
       }
       
-      const response = await fetch('/api/users/profile', {
+      const response = await fetch('http://localhost:5000/api/users/profile', {
         method: 'PUT',
         headers: {
           ...getAuthHeader(),
@@ -261,7 +461,7 @@ export const api = {
         return { success: true };
       }
       
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch('http://localhost:5000/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -278,7 +478,7 @@ export const api = {
         return mockEstimates;
       }
       
-      const response = await fetch('/api/estimates', {
+      const response = await fetch('http://localhost:5000/api/estimates', {
         headers: getAuthHeader(),
       });
       
@@ -293,7 +493,7 @@ export const api = {
         return estimate;
       }
       
-      const response = await fetch(`/api/estimates/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${id}`, {
         headers: getAuthHeader(),
       });
       
@@ -321,7 +521,7 @@ export const api = {
         return newEstimate;
       }
       
-      const response = await fetch('/api/estimates', {
+      const response = await fetch('http://localhost:5000/api/estimates', {
         method: 'POST',
         headers: {
           ...getAuthHeader(),
@@ -348,7 +548,7 @@ export const api = {
         return updatedEstimate;
       }
       
-      const response = await fetch(`/api/estimates/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${id}`, {
         method: 'PUT',
         headers: {
           ...getAuthHeader(),
@@ -366,7 +566,7 @@ export const api = {
         return { success: true };
       }
       
-      const response = await fetch(`/api/estimates/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${id}`, {
         method: 'DELETE',
         headers: getAuthHeader(),
       });
@@ -401,7 +601,7 @@ export const api = {
         ];
       }
       
-      const response = await fetch(`/api/estimates/${estimateId}/materials`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${estimateId}/materials`, {
         headers: getAuthHeader(),
       });
       
@@ -433,7 +633,7 @@ export const api = {
         ];
       }
       
-      const response = await fetch(`/api/estimates/${estimateId}/labor`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${estimateId}/labor`, {
         headers: getAuthHeader(),
       });
       
@@ -446,7 +646,7 @@ export const api = {
         return { url: 'https://example.com/mock-pdf.pdf' };
       }
       
-      const response = await fetch(`/api/estimates/${estimateId}/export-pdf`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${estimateId}/export-pdf`, {
         method: 'POST',
         headers: getAuthHeader(),
       });
@@ -460,7 +660,7 @@ export const api = {
         return { success: true };
       }
       
-      const response = await fetch(`/api/estimates/${estimateId}/send-email`, {
+      const response = await fetch(`http://localhost:5000/api/estimates/${estimateId}/send-email`, {
         method: 'POST',
         headers: {
           ...getAuthHeader(),
@@ -480,7 +680,7 @@ export const api = {
         return mockClients;
       }
       
-      const response = await fetch('/api/clients', {
+      const response = await fetch('http://localhost:5000/api/clients', {
         headers: getAuthHeader(),
       });
       
@@ -495,7 +695,7 @@ export const api = {
         return client;
       }
       
-      const response = await fetch(`/api/clients/${id}`, {
+      const response = await fetch(`http://localhost:5000/api/clients/${id}`, {
         headers: getAuthHeader(),
       });
       
@@ -516,7 +716,7 @@ export const api = {
         return newClient;
       }
       
-      const response = await fetch('/api/clients', {
+      const response = await fetch('http://localhost:5000/api/clients', {
         method: 'POST',
         headers: {
           ...getAuthHeader(),
@@ -530,18 +730,20 @@ export const api = {
   },
   
   ai: {
-    processText: async (text: string) => {
+    processText: async (text: string, location?: string) => {
       if (MOCK_MODE) {
-        return processWithGeminiAI(text);
+        
+        return processWithGeminiAI(text, location);
       }
       
-      const response = await fetch('/api/ai/process-text', {
+    
+      const response = await fetch('http://localhost:5000/api/ai/process-text', {
         method: 'POST',
         headers: {
           ...getAuthHeader(),
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, location }),
       });
       
       return handleApiResponse(response);
@@ -549,18 +751,13 @@ export const api = {
     
     processVoice: async (audioData: Blob) => {
       if (MOCK_MODE) {
-        // Simulate processing the audio and returning a transcription
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        return { 
-          text: "Kitchen remodel with new cabinets, quartz countertops, and stainless steel appliances. Approximately 200 square feet.",
-          confidence: 0.92
-        };
+        return transcribeAudioWithGemini(audioData);
       }
       
       const formData = new FormData();
       formData.append('audio', audioData);
       
-      const response = await fetch('/api/ai/process-voice', {
+      const response = await fetch('http://localhost:5000/api/ai/process-voice', {
         method: 'POST',
         headers: getAuthHeader(),
         body: formData,
@@ -584,7 +781,7 @@ export const api = {
         };
       }
       
-      const response = await fetch('/api/dashboard', {
+      const response = await fetch('http://localhost:5000/api/dashboard', {
         headers: getAuthHeader(),
       });
       

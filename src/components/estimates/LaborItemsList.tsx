@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusIcon, TrashIcon, DollarSignIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -86,9 +86,9 @@ const LaborItemsList: React.FC<LaborItemsListProps> = ({ laborItems, onUpdate })
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
@@ -117,7 +117,7 @@ const LaborItemsList: React.FC<LaborItemsListProps> = ({ laborItems, onUpdate })
                   <TableRow>
                     <TableHead className="w-[300px]">Item Description</TableHead>
                     <TableHead className="w-[100px]">Hours</TableHead>
-                    <TableHead className="w-[140px]">Rate ($/hr)</TableHead>
+                    <TableHead className="w-[140px]">Rate (₹/hr)</TableHead>
                     <TableHead className="text-right">Total</TableHead>
                     <TableHead className="w-[80px]"></TableHead>
                   </TableRow>
@@ -142,7 +142,9 @@ const LaborItemsList: React.FC<LaborItemsListProps> = ({ laborItems, onUpdate })
                       </TableCell>
                       <TableCell>
                         <div className="relative">
-                          <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <span className=" text-xl absolute left-3 top-1.5 h-4 w-4 text-muted-foreground">₹</span>
+
+                          {/* <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /> */}
                           <Input
                             type="number"
                             min="0"
@@ -200,9 +202,10 @@ const LaborItemsList: React.FC<LaborItemsListProps> = ({ laborItems, onUpdate })
                 />
               </div>
               <div>
-                <Label htmlFor="ratePerHour">Rate ($/hr)</Label>
+                <Label htmlFor="ratePerHour">Rate (₹/hr)</Label>
                 <div className="relative mt-1">
-                  <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <span className=" text-xl absolute left-3 top-1.5 h-4 w-4 text-muted-foreground">₹</span>
+                  
                   <Input
                     id="ratePerHour"
                     type="number"

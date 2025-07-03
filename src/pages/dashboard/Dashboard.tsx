@@ -42,18 +42,18 @@ const Dashboard = () => {
       }
     };
 
-    // Simulating API call
+    
     setTimeout(() => {
       setDashboardData({
         totalEstimates: 28,
         pendingEstimates: 5,
         acceptedEstimates: 18,
         recentEstimates: [
-          { id: '1', title: 'Kitchen Renovation', client: 'John Smith', amount: 12500, status: 'accepted', date: '2023-06-15' },
-          { id: '2', title: 'Bathroom Remodel', client: 'Sarah Jones', amount: 8750, status: 'pending', date: '2023-06-18' },
-          { id: '3', title: 'Deck Construction', client: 'Michael Brown', amount: 6200, status: 'accepted', date: '2023-06-20' },
-          { id: '4', title: 'Basement Finishing', client: 'Jessica White', amount: 15800, status: 'draft', date: '2023-06-22' },
-        ],
+  { id: '1', title: 'Modular Kitchen Setup', client: 'Rahul Sharma', amount: 125000, status: 'accepted', date: '2024-06-15' },
+  { id: '2', title: 'Bathroom Renovation', client: 'Priya Mehta', amount: 87500, status: 'pending', date: '2024-06-18' },
+  { id: '3', title: 'Terrace Waterproofing', client: 'Arjun Verma', amount: 62000, status: 'accepted', date: '2024-06-20' },
+  { id: '4', title: 'Living Room Interior', client: 'Sneha Kapoor', amount: 158000, status: 'draft', date: '2024-06-22' },
+],
         totalRevenue: 127500,
         winRate: 64,
       });

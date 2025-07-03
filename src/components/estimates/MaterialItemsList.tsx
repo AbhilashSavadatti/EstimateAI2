@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PlusIcon, TrashIcon, DollarSignIcon } from 'lucide-react';
+import { PlusIcon, TrashIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -89,9 +89,9 @@ const MaterialItemsList: React.FC<MaterialItemsListProps> = ({ materials, onUpda
   };
 
   const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'INR',
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(value);
@@ -163,7 +163,8 @@ const MaterialItemsList: React.FC<MaterialItemsListProps> = ({ materials, onUpda
                       </TableCell>
                       <TableCell>
                         <div className="relative">
-                          <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          {/* <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" /> */}
+                          <span className=" text-xl absolute left-3 top-1.5 h-4 w-4 text-muted-foreground">₹</span>
                           <Input
                             type="number"
                             min="0"
@@ -241,7 +242,8 @@ const MaterialItemsList: React.FC<MaterialItemsListProps> = ({ materials, onUpda
               <div>
                 <Label htmlFor="unitCost">Unit Cost</Label>
                 <div className="relative mt-1">
-                  <DollarSignIcon className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <span className=" text-xl absolute left-3 top-1.5 h-4 w-4 text-muted-foreground">₹</span>
+                  
                   <Input
                     id="unitCost"
                     type="number"
