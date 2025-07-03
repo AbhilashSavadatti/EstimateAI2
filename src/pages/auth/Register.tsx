@@ -77,7 +77,7 @@ const Register = () => {
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder="John Doe" 
+                    placeholder="Abhilash S" 
                     autoComplete="name" 
                     {...field} 
                     disabled={isLoading}
